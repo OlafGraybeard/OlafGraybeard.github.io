@@ -5,7 +5,7 @@
 	<meta name="original author" content="Jeferson Lucas">
 	<meta name="mode author" content="EVIL">
 	<link href="style.css"type="text/css" rel="stylesheet">
-	<title>TITLE</title>
+	<title>EVIL</title>
 </head>
 <body>
 	<canvas id="matrixCanvas"></canvas>
@@ -142,7 +142,7 @@
 				}
 				
 				// Переход на следующую строку или сброс
-				if ( (drops[i] * fsnew/2 > width + tailLength*fsnew || (drops[i] * fsnew) < 0 ) && Math.random() > 0.995) {
+				if ( (drops[i] * fsnew/2 > width + tailLength*fsnew || (drops[i] * (fsnew * 2)) < 0 ) && Math.random() > 0.995) {
 					lttrs[i] = symbols[Math.floor(Math.random() * symbols.length)];
 					speed[i] = Math.floor(Math.random()*5) - 1;
 					if (speed[i] > 0) {
@@ -192,5 +192,6 @@
 	</script>
 </body>
 </html>
+
 
 
