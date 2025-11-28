@@ -1,11 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru-ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EVIL</title>
+	<meta charset="utf-8">
+	<meta name="original author" content="Jeferson Lucas">
+	<meta name="mode author" content="EVIL">
+	<link href="style.css"type="text/css" rel="stylesheet">
+	<title>TITLE</title>
 </head>
 <body>
-    TEST
+	<canvas id="matrixCanvas"></canvas>
+	<style>
+		body{
+			height: 100%;
+			overflow-y: hidden;
+		}
+		@font-face {
+		   font-family: "mtx" ;
+		   src: url("courier-bold.ttf");
+		}
+		@font-face {
+		   font-family: "awesome" ;
+		   src: url("Font Awesome 7 Brands-Regular-400.otf");
+		}
+		
+	</style>
+	<script>
+	
+		const bgImage = new Image();
+		const mask = new Image();
+		bgImage.src = 'lain_bg_short.png'; // Путь к вашему изображению
+		mask.src = 'lain_bg_short_mask.png'; // Путь к вашему изображению
+		const matrixCanvas = document.getElementById('matrixCanvas');
+		// Устанавливаем одинаковые размеры для обоих канвасов
+		const width = (matrixCanvas.width = window.innerWidth);
+		const height = (matrixCanvas.height = window.innerHeight);
+		const tailLength = 35
+		//const tailDecriment = 1/tailLength
+		const matrixCtx = matrixCanvas.getContext('2d');
+		// Тёмный полупрозрачный фон для постепенного затухания символов
+		matrixCtx.fillStyle = 'rgba(0, 0, 0, 255)';
+		matrixCtx.fillRect(0, 0, width, height);
+		// Параметры "матрицы"
+		const fontSize = 24;
+		let scanline = 0;
+		const heightClose = height / fontSize
+		const rowsCount = Math.floor(height / fontSize);
+		const rows = rowsCount*4;
+		const rrrr = Math.floor(rows / rowsCount) 
+		const rowsView = Math.floor(height / fontSize);
+		const drops = Array(rows).fill(width + tailLength*fontSize); // Начальные позиции для "дождя"
+		const lttrs = Array(rows).fill(Math.floor(Math.random()*9.5)); // Начальные позиции для "дождя"
+		const speed = Array(rows).fill(0); // Начальные позиции для "дождя"
+		let text = new Array(rows).fill(null).map(function() { return new Array(tailLength).fill(0); })
+		let colShift = 120
+		const symbols = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン一二三四五六七八九十ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890aЫпРсТтКкЕ';
+		const string = [
+			' Я тебя...',
+			' Я тебя люблю',
+			' Мне грустно',
+			' Тебя нет рядом... хотя... никогда и небыло...',
+			' Рома... ты мудак... ты игнориш...',
+			' Меня интересовал ты а не толькотело твое...',
+			' Мне грустно без тебя...',
+			' Сережа, прости... но ты тоже мудак... как и я...',
+			' Прости, ',
+			' Прости... похоже это конец...',
+			' Прощай... похоже это конец...',
+		];
+		// const symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ15';
+		matrixCtx.font = `${fontSize}px mtx`;
+		matrixCtx.shadowColor = `hsl(${colShift},50%, 50%)`;
+		matrixCtx.shadowOffsetX = 0;
+		matrixCtx.shadowOffsetY = 0;
+		function absnormal( num ){
+			absolute = num / Math.abs(num);
+			return absolute;
+		}
+		function noise(){
+			return (Math.random() - 0.5) * 0.45;
+		}
+		function drawMatrix() {
+			
+			// Тёмный полупрозрачный фон для постепенного затухания символов
+			matrixCtx.globalAlpha = 0.15;
+			matrixCtx.drawImage(bgImage, 0, 0, width, height);
+			matrixCtx.globalAlpha = 1;
+			matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+			matrixCtx.fillRect(0, 0, width, height);
+			matrixCtx.shadowColor = `hsl(${colShift},0%, 0%)`;
+			// Отрисовка символов
+			for (let i = 0; i < drops.length; i++) {
+				let depth = (Math.floor(i/rowsCount)+1)
+				let fsnew = depth*fontSize
+				matrixCtx.font = `${fsnew}px mtx`;
+				matrixCtx.shadowBlur = 0;
+				matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+				//matrixCtx.fillRect( (drops[i]-tailLength) * fontSize /2, (i%heightClose) * fontSize,  fontSize * tailLength , fontSize);
+				if ( speed[i] > 0)
+				{
+					matrixCtx.fillRect( (drops[i]-tailLength) * fsnew, (i%heightClose -1) * fsnew,  fsnew * ( tailLength +1 ) , fsnew * 1.1);
+				}
+				else
+				{
+					matrixCtx.fillRect( (drops[i]) * fsnew, (i%heightClose -1 ) * fsnew,  fsnew * ( tailLength - 1 ) , fsnew * 1.1);
+				}
+				// Стиль символов
+				
+				matrixCtx.shadowBlur = 3;
+				let kek = Math.random()
+				let v = Math.floor(Math.random() * string.length)
+				let mat = string[v]
+				for (let d = 1; d < tailLength; d++) {
+					let dir = absnormal( speed[i] )
+					
+					matrixCtx.fillStyle = `hsl(${(colShift + d) + (Math.floor(i/rowsView) * 15) % 360}, ${90*((tailLength-d)/tailLength/2)}%, ${(15	*((tailLength-d)/tailLength))+((i/rowsCount)*15)}%)`;
+					if(kek <= 0.0005)
+					{
+						if (speed[i] > 0)
+						{
+							text[i][d] = mat[mat.length-d%mat.length - 1]
+						}
+						else
+						{
+							text[i][d] = mat[d%mat.length]
+						}
+					}
+					else if (Math.random() < 0.0075)
+					{
+						text[i][d] = symbols[Math.floor(Math.random() * symbols.length)];
+					}
+					matrixCtx.fillText(text[i][d], (drops[i] * fsnew) - d * fsnew * dir + noise(), (i%heightClose) * fsnew + (noise() * 3.5) );
+				}
+				
+				matrixCtx.shadowBlur = 3;
+				matrixCtx.font = `${fsnew}px mtx`;
+				matrixCtx.fillStyle = `hsl(${colShift + 180 % 360},50%, ${30 + (i/rowsCount)*10}%)`; 
+				matrixCtx.fillText(lttrs[i], drops[i] * fsnew, (i%heightClose) * fsnew);
+				
+				if (Math.random() <= 0.2) {
+					lttrs[i] = symbols[Math.floor(Math.random() * symbols.length)];
+				}
+				
+				// Переход на следующую строку или сброс
+				if ( (drops[i] * fsnew/2 > width + tailLength*fsnew || (drops[i] * fsnew) < 0 ) && Math.random() > 0.995) {
+					lttrs[i] = symbols[Math.floor(Math.random() * symbols.length)];
+					speed[i] = Math.floor(Math.random()*5) - 1;
+					if (speed[i] > 0) {
+						drops[i] = 0;
+					}
+					else if( speed[i] == 0)
+					{
+						speed[i] = -2
+						drops[i] = Math.floor((width*2+tailLength*fsnew)/(fsnew))
+					}
+					else
+					{
+						drops[i] = Math.floor((width*2+tailLength*fsnew)/(fsnew))
+					}
+					speed[i] = speed[i] * 0.05 * (1 + rrrr - depth)
+				}
+				
+				drops[i] = drops[i] + speed[i];
+			}
+			
+			
+			matrixCtx.fillStyle = 'rgba(90, 70, 50, 0.5)';
+			matrixCtx.fillRect(0, scanline, width, 5);
+			scanline = (scanline + 5) % (height + 500)
+			
+			matrixCtx.shadowBlur = 0;
+			
+			matrixCtx.globalAlpha = 0.85;
+			matrixCtx.globalCompositeOperation = "multiply";
+			matrixCtx.drawImage(mask, 0, 0, width, height);
+			
+			matrixCtx.globalAlpha = 0.65;
+			matrixCtx.globalCompositeOperation = "color";
+			matrixCtx.drawImage(bgImage, 0, 0, width, height);
+			
+			matrixCtx.globalAlpha = 0.35;
+			matrixCtx.globalCompositeOperation = "hue";
+			matrixCtx.drawImage(bgImage, 0, 0, width, height);
+			matrixCtx.globalAlpha = 1;
+			matrixCtx.globalCompositeOperation = 'source-over';
+			//colShift = Math.floor(Date.now()/1000) % 360
+			//console.log(`hsl(${colShift},50%, 50%)`);
+			
+		}
+		
+		setInterval(drawMatrix, 70); // Анимация матрицы
+	</script>
 </body>
 </html>
+
+
